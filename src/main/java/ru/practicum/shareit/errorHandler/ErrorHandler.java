@@ -4,8 +4,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import ru.practicum.shareit.user.exception.CreateDuplicateEmailException;
-import ru.practicum.shareit.user.exception.UpdateEmailExistsException;
+import ru.practicum.shareit.exception.CreateDuplicateEmailException;
+import ru.practicum.shareit.exception.UpdateEmailExistsException;
 
 @RestControllerAdvice(value = "ru.practicum.shareit")
 public class ErrorHandler {
