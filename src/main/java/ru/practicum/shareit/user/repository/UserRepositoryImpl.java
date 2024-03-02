@@ -1,9 +1,8 @@
 package ru.practicum.shareit.user.repository;
 
 import org.springframework.stereotype.Repository;
-import ru.practicum.shareit.exception.CreateDuplicateEmailException;
-import ru.practicum.shareit.exception.EntityNotFoundException;
-import ru.practicum.shareit.exception.UserAlreadyExsistExeption;
+
+import ru.practicum.shareit.exception.*;
 import ru.practicum.shareit.user.model.User;
 
 import javax.validation.ValidationException;
@@ -12,9 +11,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@Repository
+@Repository("UserRepositoryImpl")
 public class UserRepositoryImpl implements UserRepository {
-    private final Map<Long, User> userList = new HashMap<>();
+
+    private final List<User> userList = new ArrayList<>();
     private Long id = 0L;
 
     @Override
@@ -24,75 +24,58 @@ public class UserRepositoryImpl implements UserRepository {
 
     @Override
     public User findById(Long userId) {
-        if (!userList.containsKey(userId)) {
-            throw new EntityNotFoundException("Пользователя с ID=" + userId + " нет в текущем списке!");
-        }
-        return userList.values()
-                .stream()
-                .filter(user -> user.getUserId().equals(userId))
-                .findFirst()
-                .orElseThrow();
+        return userList.stream().filter(user -> user.getId() == userId).findFirst().orElseThrow();
     }
 
     @Override
     public User save(User user) {
-        checkUser(user);
-        user.setUserId(++id);
-        userList.put(user.getUserId(), user);
+        if (userList.stream().noneMatch(user1 -> user1.getEmail().equals(user.getEmail()))) {
+            if (!user.getEmail().contains("@") || user.getName().isEmpty() || user.getName().contains(" ")) {
+                throw new ValidationException("Некорректный e-mail пользователя: " + user.getEmail());
+            }
+            user.setId(++id);
+            userList.add(user);
+        } else throw new UserAlreadyExistsException("Пользователь с E-mail=" + user.getEmail() + " уже существует!");
         return user;
     }
 
     @Override
     public User put(User user) {
-        if (!userList.containsValue(user)) {
-            throw new EntityNotFoundException("Пользователя с ID=" + user.getUserId() + " нет в текущем списке!");
-        }
-        if (user.getUserId() == null) {
-            throw new ValidationException("Передан пустой аргумент!");
-        }
+        User existingUser = userList.stream()
+                .filter(u -> u.getId() == user.getId())
+                .findFirst()
+                .orElseThrow(() -> new UserNotFoundException("Пользователь с ID=" + user.getId() + " не найден!"));
         if (user.getName() == null) {
-            user.setName(userList.get(user.getUserId()).getName());
+            user.setName(existingUser.getName());
         }
         if (user.getEmail() == null) {
-            user.setName(userList.get(user.getUserId()).getEmail());
+            user.setEmail(existingUser.getEmail());
         }
-        if (userList.values()
-                .stream()
-                .filter(user1 -> user1.getEmail().equals(user.getEmail()))
-                .allMatch(user1 -> user1.getUserId().equals(user.getUserId()))) {
-            if (isValidUser(user)) {
-                userList.put(user.getUserId(), user);
-            }
-        } else throw new UserAlreadyExsistExeption("Пользователь с E-mail=" + user.getEmail() + " уже существует!");
-
-
+        existingUser.setName(user.getName());
+        if (checkNameEmail(user.getEmail())) {
+            existingUser.setEmail(user.getEmail());
+        } else {
+            throw new CorrectNameEmailException("Некорректный e-mail пользователя: " + user.getEmail());
+        }
         return user;
     }
 
     @Override
-    public void delete(Long userId) {
-        if (!userList.containsKey(userId)) {
-            throw new EntityNotFoundException("Пользователя с ID=" + userId + " нет в текущем списке!");
+    public User delete(Long id) {
+        if (id == null) {
+            throw new ValidationException("Передан пустой аргумент!");
         }
-        userList.remove(userId);
+        User existingUser = userList.stream()
+                .filter(u -> u.getId() == id)
+                .findFirst()
+                .orElseThrow(() -> new UserNotFoundException("Пользователь с ID=" + id + " не найден!"));
+        userList.remove(existingUser);
+        return existingUser;
+
     }
 
-    public void checkUser(User user) {
-        userList.forEach((aLong, user1) -> {
-            if (user1.getEmail().equals(user.getEmail())) {
-                throw new CreateDuplicateEmailException("Пользователь с email=" + user.getEmail() + " уже есть!");
-            }
-        });
+    private boolean checkNameEmail(String email) {
+        String[] data = email.split("@");
+        return !data[1].contains(data[0]);
     }
-
-    private boolean isValidUser(User user) {
-        if (!user.getEmail().contains("@")) {
-            throw new ValidationException("Некорректный e-mail пользователя: " + user.getEmail());
-        }
-        if ((user.getName().isEmpty()) || (user.getName().contains(" "))) {
-            throw new ValidationException("Некорректный логин пользователя: " + user.getName());
-        }
-        return true;
-    }
-
 }

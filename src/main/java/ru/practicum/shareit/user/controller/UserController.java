@@ -3,9 +3,9 @@ package ru.practicum.shareit.user.controller;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.service.UserService;
 import ru.practicum.shareit.exception.CreateDuplicateEmailException;
-import ru.practicum.shareit.user.model.User;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -21,36 +21,37 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping
-    public List<User> getAllUsers() {
-        List<User> userList = userService.findAllUser();
+    public List<UserDto> getAllUsers() {
+        List<UserDto> userList = userService.findAllUser();
         log.info("Список юзеров выведен, их количество \"{}\"", userList.size());
         return userList;
     }
 
     @PostMapping
-    public User saveNewUser(@Valid @RequestBody User user) {
-        User userPost = userService.addNewUser(user);
-        log.info("Юзер под номером \"{}\" добавлен", user.getId());
+    public UserDto saveNewUser(@Valid @RequestBody UserDto userDto) {
+        UserDto userPost = userService.addNewUser(userDto);
+        log.info("Юзер под номером \"{}\" добавлен", userPost.getId());
         return userPost;
     }
 
     @GetMapping(value = "/{id}")
-    public User getUserById(@PathVariable long id) {
-        User user = userService.findByIdUser(id);
+    public UserDto getUserById(@PathVariable Long id) {
+        UserDto user = userService.findByIdUser(id);
         log.info("Юзер под номером \"{}\" выведен", user.getId());
         return user;
     }
 
     @PatchMapping(value = "/{id}")
-    public User updateUser(@PathVariable long id, @RequestBody User user) throws CreateDuplicateEmailException {
-        userService.updateUser(id, user);
+    public UserDto updateUser(@PathVariable Long id, @RequestBody UserDto userDto) throws CreateDuplicateEmailException {
+        userService.updateUser(id, userDto);
         log.info("Юзер под номером \"{}\" обновлен", id);
         return userService.findByIdUser(id);
     }
 
     @DeleteMapping(value = "/{id}")
-    public void deleteUser(@PathVariable long id) {
-        userService.deleteUser(id);
+    public UserDto deleteUser(@PathVariable Long id) {
+        UserDto userDto = userService.deleteUser(id);
         log.info("Юзер под номером \"{}\" удален", id);
+        return userDto;
     }
 }
