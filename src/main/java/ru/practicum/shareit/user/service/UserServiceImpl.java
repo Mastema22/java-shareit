@@ -1,39 +1,52 @@
 package ru.practicum.shareit.user.service;
 
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import ru.practicum.shareit.user.dto.UserDto;
+import ru.practicum.shareit.user.mapper.UserMapper;
 import ru.practicum.shareit.user.repository.UserRepository;
-import ru.practicum.shareit.user.model.User;
 
 import java.util.List;
 
+import static java.util.stream.Collectors.toList;
+
 @Service
-@RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
     private final UserRepository repository;
+    private final UserMapper mapper;
 
-    @Override
-    public List<User> findAllUser() {
-        return repository.findAll();
+    public UserServiceImpl(@Qualifier("UserRepositoryImpl") UserRepository repository, UserMapper mapper) {
+        this.repository = repository;
+        this.mapper = mapper;
     }
 
     @Override
-    public User findByIdUser(long id) {
-        return repository.findById(id);
+    public List<UserDto> findAllUser() {
+        return repository.findAll().stream()
+                .map(mapper::toUserDto)
+                .collect(toList());
     }
 
     @Override
-    public User addNewUser(User user) {
-        return repository.save(user);
+    public UserDto findByIdUser(Long id) {
+        return mapper.toUserDto(repository.findById(id));
     }
 
     @Override
-    public User updateUser(long id, User user) {
-        return repository.put(id, user);
+    public UserDto addNewUser(UserDto userDto) {
+        return mapper.toUserDto(repository.save(mapper.toUser(userDto)));
     }
 
     @Override
-    public void deleteUser(long id) {
-        repository.delete(id);
+    public UserDto updateUser(Long id, UserDto userDto) {
+        if (userDto.getId() == null) {
+            userDto.setId(id);
+        }
+        return mapper.toUserDto(repository.put(mapper.toUser(userDto)));
+    }
+
+    @Override
+    public UserDto deleteUser(Long id) {
+        return mapper.toUserDto(repository.delete(id));
     }
 }

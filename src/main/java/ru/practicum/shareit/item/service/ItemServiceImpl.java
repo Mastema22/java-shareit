@@ -24,12 +24,5 @@ public class ItemServiceImpl implements ItemService {
     public Item searchItem(String text) {
         return repository.searchItem(text);
     }
-
-    private void checkItem(long itemId) {
-        if (repository.getItemById(itemId) == null) {
-            throw new EntityNotFoundException("Нет вещей с ID = " + itemId);
-        }
-    }
-
-    private void chekUserId
 }
+
