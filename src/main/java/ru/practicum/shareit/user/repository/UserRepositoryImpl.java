@@ -1,20 +1,25 @@
 package ru.practicum.shareit.user.repository;
 
 import org.springframework.stereotype.Repository;
+
 import ru.practicum.shareit.exception.*;
 import ru.practicum.shareit.user.model.User;
 
+import javax.validation.ValidationException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Repository("UserRepositoryImpl")
 public class UserRepositoryImpl implements UserRepository {
+
     private final List<User> userList = new ArrayList<>();
     private Long id = 0L;
 
     @Override
     public List<User> findAll() {
-        return userList;
+        return (List<User>) userList.values();
     }
 
     @Override
