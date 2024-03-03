@@ -1,28 +1,78 @@
 package ru.practicum.shareit.item.service;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-import ru.practicum.shareit.exception.EntityNotFoundException;
+import ru.practicum.shareit.exception.ItemNotFoundException;
+import ru.practicum.shareit.exception.ValidationException;
+import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 public class ItemServiceImpl implements ItemService {
-    private ItemRepository repository;
-    @Override
-    public Item addNewItem(long it, Item item) {
-        return repository.saveItem(it, item);
+    private final ItemRepository repository;
+    private final ItemMapper mapper;
+
+    public ItemServiceImpl(@Qualifier("ItemRepositoryImpl") ItemRepository repository, ItemMapper mapper) {
+        this.repository = repository;
+        this.mapper = mapper;
     }
+
     @Override
-    public Item updateItem(long id, Item item) {
-        return repository.updateItem(id, item);
+    public ItemDto addNewItem(Long itemId, ItemDto itemDto) {
+        return mapper.toItemDto(repository.save(mapper.toItem(itemDto, itemId)));
     }
+
     @Override
-    public Item getItem(long id) {
-        return repository.getItemById(id);
+    public ItemDto updateItem(Long itemId, Long ownerId, ItemDto itemDto) {
+        if (itemDto.getId() == null) {
+            itemDto.setId(itemId);
+        }
+        Item oldItem = repository.getById(itemId);
+        if (!oldItem.getOwnerId().equals(ownerId)) {
+            throw new ItemNotFoundException("У пользователя нет такой вещи!");
+        }
+        return mapper.toItemDto(repository.update(mapper.toItem(itemDto, ownerId)));
     }
+
     @Override
-    public Item searchItem(String text) {
-        return repository.searchItem(text);
+    public ItemDto getItemById(Long itemId) {
+        return mapper.toItemDto(repository.getById(itemId));
+    }
+
+    @Override
+    public List<ItemDto> getItemsByOwner(Long ownerId) {
+        return repository.getItemsByOwner(ownerId).stream()
+                .map(mapper::toItemDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public ItemDto deleteItem(Long itemId, Long ownerId) {
+        Item item = repository.getById(itemId);
+        if (!item.getOwnerId().equals(ownerId)) {
+            throw new ItemNotFoundException("У пользователя нет такой вещи!");
+        }
+        return mapper.toItemDto(repository.delete(itemId));
+    }
+
+    @Override
+    public void deleteItemsByOwner(Long ownerId) {
+        repository.deleteItemsByOwner(ownerId);
+    }
+
+    @Override
+    public List<ItemDto> searchItem(String text) {
+        if (text.isEmpty()) {
+            text = "0";
+        }
+        text = text.toLowerCase();
+        return repository.getItemsBySearchQuery(text).stream()
+                .map(mapper::toItemDto)
+                .collect(Collectors.toList());
     }
 }
-

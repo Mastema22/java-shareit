@@ -7,9 +7,7 @@ import ru.practicum.shareit.user.model.User;
 
 import javax.validation.ValidationException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Repository("UserRepositoryImpl")
 public class UserRepositoryImpl implements UserRepository {
@@ -19,17 +17,21 @@ public class UserRepositoryImpl implements UserRepository {
 
     @Override
     public List<User> findAll() {
-        return (List<User>) userList.values();
+        return userList;
     }
 
     @Override
     public User findById(Long userId) {
-        return userList.stream().filter(user -> user.getId() == userId).findFirst().orElseThrow();
+        return userList.stream()
+                .filter(user -> user.getId() == userId)
+                .findFirst()
+                .orElseThrow(() -> new UserNotFoundException("Пользователь с ID=" + id + " не найден!"));
     }
 
     @Override
     public User save(User user) {
-        if (userList.stream().noneMatch(user1 -> user1.getEmail().equals(user.getEmail()))) {
+        if (userList.stream()
+                .noneMatch(user1 -> user1.getEmail().equals(user.getEmail()))) {
             if (!user.getEmail().contains("@") || user.getName().isEmpty() || user.getName().contains(" ")) {
                 throw new ValidationException("Некорректный e-mail пользователя: " + user.getEmail());
             }

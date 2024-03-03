@@ -1,22 +1,21 @@
 package ru.practicum.shareit.item.model;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
-import ru.practicum.shareit.user.model.User;
 
-import javax.validation.constraints.NotEmpty;
-
+import javax.validation.constraints.NotBlank;
 
 /**
  * TODO Sprint add-controllers.
  */
 @Data
+@AllArgsConstructor
 public class Item {
     private Long id;
-    @NotEmpty
+    @NotBlank
     private String name;
-    @NotEmpty
     private String description;
-    private boolean isAvailable = false;
-    private User owner;
-    private String request;
+    private Boolean available;
+    private Long ownerId;
+    private Long requestId;
 }
