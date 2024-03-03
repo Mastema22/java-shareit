@@ -23,7 +23,7 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public User findById(Long userId) {
         return userList.stream()
-                .filter(user -> user.getId() == userId)
+                .filter(user -> user.getId().equals(userId))
                 .findFirst()
                 .orElseThrow(() -> new UserNotFoundException("Пользователь с ID=" + id + " не найден!"));
     }
@@ -68,7 +68,7 @@ public class UserRepositoryImpl implements UserRepository {
             throw new ValidationException("Передан пустой аргумент!");
         }
         User existingUser = userList.stream()
-                .filter(u -> u.getId() == id)
+                .filter(u -> u.getId().equals(id))
                 .findFirst()
                 .orElseThrow(() -> new UserNotFoundException("Пользователь с ID=" + id + " не найден!"));
         userList.remove(existingUser);
