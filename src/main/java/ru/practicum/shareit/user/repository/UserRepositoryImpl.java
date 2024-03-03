@@ -44,7 +44,7 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public User put(User user) {
         User existingUser = userList.stream()
-                .filter(u -> u.getId() == user.getId())
+                .filter(u -> u.getId().equals(user.getId()))
                 .findFirst()
                 .orElseThrow(() -> new UserNotFoundException("Пользователь с ID=" + user.getId() + " не найден!"));
         if (user.getName() == null) {

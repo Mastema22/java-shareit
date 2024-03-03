@@ -79,7 +79,7 @@ public class ItemRepositoryImpl implements ItemRepository {
 
     @Override
     public List<Item> getItemsBySearchQuery(String text) {
-        List<Item> searchItems = new ArrayList<>();
+        List<Item> searchItems;
         if (!text.isBlank()) {
             searchItems = itemList.stream()
                     .filter(Item::getAvailable)
