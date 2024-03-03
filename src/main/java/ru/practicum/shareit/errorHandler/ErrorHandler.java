@@ -32,6 +32,7 @@ public class ErrorHandler {
     public ErrorResponse handleUserAlreadyExistException(final UserAlreadyExistsException e) {
         return new ErrorResponse(e.getMessage());
     }
+
     @ExceptionHandler
     @ResponseStatus(HttpStatus.CONFLICT)
     public ErrorResponse handleCorrectNameEmailException(final CorrectNameEmailException e) {
