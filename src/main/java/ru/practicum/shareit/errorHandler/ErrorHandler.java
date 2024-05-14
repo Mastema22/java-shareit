@@ -69,4 +69,10 @@ public class ErrorHandler {
         return new ErrorResponse(e.getMessage());
     }
 
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleCommentNotAvailableException(final CommentNotAvailableException e) {
+        return new ErrorResponse(e.getMessage());
+    }
+
 }

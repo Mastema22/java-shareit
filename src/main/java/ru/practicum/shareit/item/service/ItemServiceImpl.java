@@ -7,6 +7,7 @@ import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.State;
 import ru.practicum.shareit.booking.model.Status;
 import ru.practicum.shareit.booking.repository.BookingRepository;
+import ru.practicum.shareit.exception.CommentNotAvailableException;
 import ru.practicum.shareit.exception.ItemNotFoundException;
 import ru.practicum.shareit.exception.UserNotFoundException;
 import ru.practicum.shareit.exception.ValidationException;
@@ -22,6 +23,7 @@ import ru.practicum.shareit.user.repository.UserRepository;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -78,6 +80,7 @@ public class ItemServiceImpl implements ItemService {
     @Override
     public List<ItemDto> getItemsByOwner(Long ownerId) {
         List<Item> itemList = itemRepository.getItemsByOwner(ownerId);
+        itemList.sort(Comparator.comparing(Item::getId));
         List<ItemDto> itemDtoList = new ArrayList<>();
         itemList.forEach(item -> itemDtoList.add(itemMapper.toDto(
                 item, item.getOwnerId(),
@@ -115,12 +118,12 @@ public class ItemServiceImpl implements ItemService {
     public CommentDto createComment(Long userId, Long itemId, CommentDto commentDto) {
         User user = userRepository.findUserById(userId);
         Item item = itemRepository.findById(itemId).orElseThrow(() -> new ItemNotFoundException("Вещь с ID=" + itemId + " не найдена!"));
-       if (!commentDto.getAuthorName().equals(user.getName())) {
-            throw new ValidationException("Некорркетный статус!");
-        }
         Booking booking = bookingRepository
                 .findFirstByItemIdAndEndBeforeAndStatus(itemId, LocalDateTime.now(), Status.APPROVED)
-                .orElseThrow(() -> new UserNotFoundException("Пользователь с ID = " + userId + " не арендовал вещь с ID = " + itemId));
+                .orElseThrow(() -> new CommentNotAvailableException("Пользователь с ID = " + userId + " не арендовал вещь с ID = " + itemId));
+        if (commentDto.getText().isEmpty()) {
+            throw new CommentNotAvailableException("Пользователь с ID = " + userId + " не арендовал вещь с ID = " + itemId);
+        }
         if (booking.getBooker().getId().equals(userId)
                 && Objects.equals(Booking.getState(booking), State.PAST)
                 && !Objects.equals(booking.getStatus(), (Status.CANCELLED))
