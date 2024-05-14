@@ -3,6 +3,7 @@ package ru.practicum.shareit.item.controller;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.service.ItemService;
 import ru.practicum.shareit.user.dto.UserDto;
@@ -38,17 +39,16 @@ public class ItemController {
     }
 
     @GetMapping("/{itemId}")
-    public ItemDto getItemById(@PathVariable Long itemId) {
-        ItemDto itemDto = itemService.getItemById(itemId);
+    public ItemDto getItemById(@PathVariable Long itemId, @RequestHeader("X-Sharer-User-Id") Long userId) {
+        ItemDto itemDto = itemService.getItemById(itemId, userId);
         log.info("Запрос на получение вещи с ID={}", itemId);
         return itemDto;
     }
 
     @DeleteMapping("/{itemId}")
-    public ItemDto delete(@PathVariable Long itemId, @RequestHeader(name = "X-Sharer-User-Id") Long ownerId) {
-        ItemDto itemDto = itemService.deleteItem(itemId, ownerId);
+    public void delete(@PathVariable Long itemId, @RequestHeader(name = "X-Sharer-User-Id") Long ownerId) {
+        itemService.deleteItem(itemId, ownerId);
         log.info("Удаление вещи с ID={}", itemId);
-        return itemDto;
     }
 
     @GetMapping
@@ -65,4 +65,12 @@ public class ItemController {
         log.info("Поиск вещи с текстом={}", text);
         return searchItems;
     }
+
+    @PostMapping("/{itemId}/comment")
+    public CommentDto create(@RequestHeader(name = "X-Sharer-User-Id") Long userId,
+                             @PathVariable Long itemId,
+                             @RequestBody CommentDto commentDto) {
+        return itemService.createComment(userId, itemId, commentDto);
+    }
+
 }

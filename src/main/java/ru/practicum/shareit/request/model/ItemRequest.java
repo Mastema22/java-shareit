@@ -1,11 +1,10 @@
-package ru.practicum.shareit.request;
+package ru.practicum.shareit.request.model;
 
-import lombok.Data;
 import ru.practicum.shareit.user.model.User;
 
 import java.util.Date;
 
-@Data
+
 public class ItemRequest {
     private Long id;
     private String description;
