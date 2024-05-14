@@ -17,6 +17,7 @@ import java.util.List;
 @RequestMapping(path = "/bookings")
 public class BookingController {
     private final BookingService bookingService;
+
     @PostMapping
     public BookingOutputDto newBooking(@RequestHeader(name = "X-Sharer-User-Id") Long bookerId,
                                        @Valid @RequestBody BookingInputDto bookingDto) {
@@ -47,7 +48,7 @@ public class BookingController {
                                                   @RequestParam(defaultValue = "ALL") String state,
                                                   @RequestParam(required = false, defaultValue = "0") int from,
                                                   @RequestParam(required = false, defaultValue = "10") int size) {
-        List<BookingOutputDto> bookingOutputDtoList = bookingService.findAllByBooker(ownerId, state, PageRequest.of(from,size));
+        List<BookingOutputDto> bookingOutputDtoList = bookingService.findAllByBooker(ownerId, state, PageRequest.of(from, size));
         log.info("Получены все бронирования пользователя с ID = " + ownerId);
         return bookingOutputDtoList;
 
@@ -58,7 +59,7 @@ public class BookingController {
                                                  @RequestParam(defaultValue = "ALL") String state,
                                                  @RequestParam(required = false, defaultValue = "0") int from,
                                                  @RequestParam(required = false, defaultValue = "10") int size) {
-        List<BookingOutputDto> bookingOutputDtoList = bookingService.findAllByOwner(ownerId, state, PageRequest.of(from,size));
+        List<BookingOutputDto> bookingOutputDtoList = bookingService.findAllByOwner(ownerId, state, PageRequest.of(from, size));
         log.info("Получены все бронирования для всех вещей пользователя с ID = " + ownerId);
         return bookingOutputDtoList;
     }

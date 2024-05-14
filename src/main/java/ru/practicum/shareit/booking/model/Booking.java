@@ -42,6 +42,7 @@ public class Booking {
         }
         return null;
     }
+
     private static State chooseTime(Booking booking) {
         if (booking.getStart().isAfter(LocalDateTime.now())) {
             return State.FUTURE;

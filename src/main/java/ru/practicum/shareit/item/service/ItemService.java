@@ -19,5 +19,6 @@ public interface ItemService {
     void deleteItemsByOwner(Long ownerId);
 
     List<ItemDto> searchItem(String text);
+
     CommentDto createComment(Long userId, Long itemId, CommentDto commentDto);
 }

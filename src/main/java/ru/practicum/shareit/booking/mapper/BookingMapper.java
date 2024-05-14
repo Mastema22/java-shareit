@@ -14,6 +14,7 @@ import ru.practicum.shareit.item.repository.ItemRepository;
 @Data
 public class BookingMapper {
     private final ItemRepository repository;
+
     public BookingOutputDto toBookingDto(Booking booking) {
         return new BookingOutputDto(
                 booking.getId(),
@@ -26,7 +27,7 @@ public class BookingMapper {
     }
 
     public Booking toBooking(BookingInputDto dto) {
-        Item item = repository.findById(dto.getItemId()).orElseThrow(()-> new ItemNotFoundException("Вещб с ID = " + dto.getItemId() + "не найдена!"));
+        Item item = repository.findById(dto.getItemId()).orElseThrow(() -> new ItemNotFoundException("Вещб с ID = " + dto.getItemId() + "не найдена!"));
         return new Booking(
                 null,
                 dto.getStart(),

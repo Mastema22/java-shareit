@@ -10,6 +10,7 @@ import ru.practicum.shareit.user.model.User;
 public interface UserRepository extends JpaRepository<User, Long> {
 
     User findUserById(Long id);
+
     @Transactional
     @Modifying
     @Query("DELETE FROM User u WHERE u.id = :id")
