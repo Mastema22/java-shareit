@@ -46,9 +46,8 @@ public class UserController {
     }
 
     @DeleteMapping(value = "/{id}")
-    public UserDto deleteUser(@PathVariable Long id) {
-        UserDto userDto = userService.deleteUser(id);
+    public void deleteUser(@PathVariable Long id) {
+        userService.deleteUser(id);
         log.info("Юзер под номером \"{}\" удален", id);
-        return userDto;
     }
 }
