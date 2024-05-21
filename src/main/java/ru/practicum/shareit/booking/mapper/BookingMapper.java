@@ -27,7 +27,7 @@ public class BookingMapper {
     }
 
     public Booking toBooking(BookingInputDto dto) {
-        Item item = repository.findById(dto.getItemId()).orElseThrow(() -> new ItemNotFoundException("Вещб с ID = " + dto.getItemId() + "не найдена!"));
+        Item item = repository.findById(dto.getItemId()).orElseThrow(() -> new ItemNotFoundException("Вещь с ID = " + dto.getItemId() + "не найдена!"));
         return new Booking(
                 null,
                 dto.getStart(),
