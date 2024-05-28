@@ -1,7 +1,18 @@
 package ru.practicum.shareit.request.repository;
 
-import org.springframework.data.jpa.repository.JpaRepository;
-import ru.practicum.shareit.item.model.Item;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.repository.PagingAndSortingRepository;
+import ru.practicum.shareit.request.model.ItemRequest;
 
-public interface ItemRequestRepository extends JpaRepository<Item, Long> {
+import java.util.List;
+
+public interface ItemRequestRepository extends PagingAndSortingRepository<ItemRequest, Long> {
+    List<ItemRequest> findAllByRequesterId(Long requesterId, Sort sort);
+
+    Page<ItemRequest> findAllByRequesterIdNot(Long userId, Pageable pageable);
+
+    List<ItemRequest> findAllByRequesterIdNotOrderByCreatedDesc(Long userId);
+
 }

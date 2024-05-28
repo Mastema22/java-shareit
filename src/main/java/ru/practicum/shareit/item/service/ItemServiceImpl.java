@@ -1,6 +1,7 @@
 package ru.practicum.shareit.item.service;
 
 import lombok.Data;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.mapper.BookingMapper;
 import ru.practicum.shareit.booking.model.Booking;
@@ -26,7 +27,8 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.toList;
 
 @Service
 @Data
@@ -111,7 +113,7 @@ public class ItemServiceImpl implements ItemService {
         text = text.toLowerCase();
         return itemRepository.getItemsBySearchQuery(text).stream()
                 .map(itemMapper::toItemDto)
-                .collect(Collectors.toList());
+                .collect(toList());
     }
 
     @Override
@@ -134,6 +136,13 @@ public class ItemServiceImpl implements ItemService {
             throw new UserNotFoundException("Некорркетный статус!");
     }
 
+    @Override
+    public List<ItemDto> getItemsByRequesterId(Long requestId) {
+        return itemRepository.findAllByRequestId(requestId, Sort.by(Sort.Direction.DESC, "created")).stream()
+                .map(itemMapper::toItemDto)
+                .collect(toList());
+    }
+
     private Booking getNextBooking(Long itemId, Booking lastBooking) {
         LocalDateTime lastBookingEnd;
         if (Objects.isNull(lastBooking)) {
@@ -153,6 +162,6 @@ public class ItemServiceImpl implements ItemService {
     private List<CommentDto> getCommentsDto(Long itemId) {
         return commentRepository.findAllByItemId(itemId, null).stream()
                 .map(commentMapper::toDto)
-                .collect(Collectors.toList());
+                .collect(toList());
     }
 }

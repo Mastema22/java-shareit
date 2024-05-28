@@ -4,9 +4,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
-import ru.practicum.shareit.request.service.RequestService;
+import ru.practicum.shareit.request.dto.ItemRequestDtoByOwner;
+import ru.practicum.shareit.request.service.ItemRequestService;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Slf4j
@@ -14,48 +18,43 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/requests")
 public class ItemRequestController {
-    private final RequestService requestService;
+    private final ItemRequestService itemRequestService;
+    private final String userIdHeader = "X-Sharer-User-Id";
 
-    /*POST /requests — добавить новый запрос вещи. Основная часть запроса — текст запроса, где пользователь описывает,
-    какая именно вещь ему нужна.*/
     @PostMapping
-    public ItemRequestDto newItemRequest(@RequestHeader(name = "X-Sharer-User-Id") Long itemId,
-                                     @Valid @RequestBody ItemRequestDto itemRequestDto) {
-        return null;
+    public ItemRequestDto newItemRequest(@Valid @RequestBody ItemRequestDto itemRequestDto,
+                                         @RequestHeader(name = userIdHeader) Long requesterId) {
+        log.info("Получен POST-запрос к эндпоинту: '/requests' " +
+                "на создание запроса вещи от пользователя с ID={}", requesterId);
+        return itemRequestService.newRequestItem(itemRequestDto, requesterId, LocalDateTime.now());
+
+
     }
 
-    /*GET /requests — получить список своих запросов вместе с данными об ответах на них. Для каждого запроса должны
-     указываться описание, дата и время создания и список ответов в формате: id вещи, название, её описание description,
-      а также requestId запроса и признак доступности вещи available. Так в дальнейшем, используя указанные id вещей,
-       можно будет получить подробную информацию о каждой вещи. Запросы должны возвращаться в отсортированном порядке
-       от более новых к более старым.*/
+    @GetMapping("/{requestId}")
+    public ItemRequestDtoByOwner getListRequestsAndAnswers(@PathVariable("requestId") Long itemRequestId,
+                                                                 @RequestHeader(name = userIdHeader) Long userId) {
+        log.info("Получен GET-запрос к эндпоинту: '/requests' на получение запроса с ID={}", itemRequestId);
+        return itemRequestService.getListRequestsAndAnswers(itemRequestId, userId);
+
+    }
 
     @GetMapping
-    public List<ItemRequestDto> getListRequestsAndAnswers(@RequestHeader(name = "X-Sharer-User-Id") Long requestId) {
-        return null;
+    public List<ItemRequestDto>  getDataByItemRequest(@RequestHeader(name = userIdHeader) Long userId) {
+        log.info("Получен GET-запрос к эндпоинту: '/requests' на получение запросов пользователя ID={}",
+                userId);
+        return itemRequestService.getDataByItemRequest(userId);
+
     }
 
-    /*GET /requests/all?from={from}&size={size} — получить список запросов, созданных другими пользователями. С помощью
-    этого эндпоинта пользователи смогут просматривать существующие запросы, на которые они могли бы ответить. Запросы
-    сортируются по дате создания: от более новых к более старым. Результаты должны возвращаться постранично. Для этого
-    нужно передать два параметра: from — индекс первого элемента, начиная с 0, и size — количество элементов для отображения.*/
+    @GetMapping("/all")
+    public List<ItemRequestDto> getListRequestsOtherUsers(@RequestHeader(name = userIdHeader) Long userId,
+                                                          @RequestParam(defaultValue = "0") @Min(0) Integer from,
+                                                          @RequestParam(required = false) @Min(1) @Max(20) Integer size) {
+        log.info("Получен GET-запрос к эндпоинту: '/requests/all' от пользователя с ID={} на получение всех запросов",
+                userId);
+        return itemRequestService.getListRequestsOtherUsers(userId, from, size);
 
-    @GetMapping
-    public List<ItemRequestDto> getListRequestsOtherUsers(@RequestHeader(name = "X-Sharer-User-Id") Long requestId,
-                                                              @RequestParam(defaultValue = "ALL") String state,
-                                                              @RequestParam(required = false, defaultValue = "0") int from,
-                                                              @RequestParam(required = false, defaultValue = "10") int size) {
-        return null;
     }
-   /* GET /requests/{requestId} — получить данные об одном конкретном запросе вместе с данными об ответах на него в том же
-        формате, что и в эндпоинте GET /requests. Посмотреть данные об отдельном запросе может любой пользователь. */
 
-    @GetMapping(value = "/{requestId}")
-    public ItemRequestDto getDataByItemRequest(@RequestHeader(name = "X-Sharer-User-Id") Long requestId,
-                                               @PathVariable Long orderId) {
-        return null;
-    }
 }
-
-
-
