@@ -72,9 +72,9 @@ public class ItemRequestServiceImpl implements ItemRequestService {
         );
         List<ItemRequest> itemRequestList = itemRequestRepository.findAllByRequesterIdNotOrderByCreatedDesc(requesterId);
         if (itemRequestList.isEmpty()) {
-            return  Collections.emptyList();
+            return Collections.emptyList();
         }
-        
+
 
         return itemRequestRepository.findAllByRequesterId(requesterId, Sort.by(Sort.Direction.DESC, "created")).stream()
                 .map(itemRequestMapper::toItemRequestDto)
