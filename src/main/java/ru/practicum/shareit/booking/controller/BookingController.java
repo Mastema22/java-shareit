@@ -9,6 +9,7 @@ import ru.practicum.shareit.booking.dto.BookingOutputDto;
 import ru.practicum.shareit.booking.service.BookingService;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Min;
 import java.util.List;
 
 @Slf4j
@@ -57,8 +58,8 @@ public class BookingController {
     @GetMapping(value = "/owner")
     public List<BookingOutputDto> findAllByOwner(@RequestHeader(name = "X-Sharer-User-Id") Long ownerId,
                                                  @RequestParam(defaultValue = "ALL") String state,
-                                                 @RequestParam(required = false, defaultValue = "0") int from,
-                                                 @RequestParam(required = false, defaultValue = "10") int size) {
+                                                 @RequestParam(required = false, defaultValue = "0") @Min(0) int from,
+                                                 @RequestParam(required = false, defaultValue = "10") @Min(1) int size) {
         List<BookingOutputDto> bookingOutputDtoList = bookingService.findAllByOwner(ownerId, state, PageRequest.of(from, size));
         log.info("Получены все бронирования для всех вещей пользователя с ID = " + ownerId);
         return bookingOutputDtoList;

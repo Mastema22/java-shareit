@@ -25,7 +25,8 @@ public class ItemRequestMapper {
                 itemRequest.getId(),
                 itemRequest.getDescription(),
                 itemRequest.getRequester(),
-                itemRequest.getCreated()
+                itemRequest.getCreated(),
+                null
         );
     }
 
@@ -47,6 +48,4 @@ public class ItemRequestMapper {
                 reply
         );
     }
-
-
 }

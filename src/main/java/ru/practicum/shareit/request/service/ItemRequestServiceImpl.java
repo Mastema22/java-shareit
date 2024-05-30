@@ -38,8 +38,8 @@ public class ItemRequestServiceImpl implements ItemRequestService {
 
     @Override
     public ItemRequestDto newRequestItem(ItemRequestDto itemRequestDto, Long requesterId, LocalDateTime created) {
-        User user = userRepository.findById(requesterId).orElseThrow(
-                () -> new UserNotFoundException("Пользователь с ID= " + requesterId + " не найден!"));
+        User user = userRepository.findById(requesterId)
+                .orElseThrow(() -> new UserNotFoundException("Пользователь с ID = " + requesterId + " не найден!"));
         itemRequestDto.setRequester(user);
         itemRequestDto.setCreated(created);
         ItemRequest itemRequest = itemRequestMapper.toItemRequest(itemRequestDto);
@@ -48,44 +48,30 @@ public class ItemRequestServiceImpl implements ItemRequestService {
 
     @Override
     public ItemRequestDtoByOwner getListRequestsAndAnswers(Long itemRequestId, Long userId) {
-        if (!userRepository.existsById(userId)) {
-            throw new UserNotFoundException("Пользователь с ID= " + userId + " не найден!");
-        }
+        checkExistUser(userId);
         ItemRequest itemRequest = itemRequestRepository.findById(itemRequestId).orElseThrow(
                 () -> new ItemRequestNotFoundException("Запрос ID = " + itemRequestId + " не найден!")
         );
-        List<Item> items = itemRepository.findByRequestId(itemRequestId);
-        List<ItemDto> reply = new ArrayList<>();
-        for (Item item : items) {
-            reply.add(itemMapper.toItemDto(item));
-        }
+        List<ItemRequest> itemRequests = itemRequestRepository.findAllByRequesterIdNotOrderByCreatedDesc(userId);
+        List<ItemDto> reply = itemRepository.findByRequestId(itemRequestId)
+                .stream()
+                .map(itemMapper::toItemDto)
+                .collect(toList());
         return ItemRequestMapper.doItemRequestDtoByOwner(itemRequest, reply);
     }
 
     @Override
     public List<ItemRequestDto> getDataByItemRequest(Long requesterId) {
-        if (!userRepository.existsById(requesterId)) {
-            throw new UserNotFoundException("Пользователь с ID = " + requesterId + " не найден!");
-        }
-        ItemRequest itemRequest = itemRequestRepository.findById(requesterId).orElseThrow(
-                () -> new ItemRequestNotFoundException("Запрос ID = " + requesterId + " не найден!")
-        );
-        List<ItemRequest> itemRequestList = itemRequestRepository.findAllByRequesterIdNotOrderByCreatedDesc(requesterId);
-        if (itemRequestList.isEmpty()) {
-            return Collections.emptyList();
-        }
-
-
-        return itemRequestRepository.findAllByRequesterId(requesterId, Sort.by(Sort.Direction.DESC, "created")).stream()
+        checkExistUser(requesterId);
+        List<ItemRequestDto> listItemRequestDto = itemRequestRepository.findAllByRequesterId(requesterId, Sort.by(Sort.Direction.DESC, "created")).stream()
                 .map(itemRequestMapper::toItemRequestDto)
                 .collect(toList());
+        return checkItemRequestDto(listItemRequestDto);
     }
 
     @Override
     public List<ItemRequestDto> getListRequestsOtherUsers(Long userId, Integer from, Integer size) {
-        if (!userRepository.existsById(userId)) {
-            throw new UserNotFoundException("Пользователь с ID= " + userId + " не найден!");
-        }
+        checkExistUser(userId);
         List<ItemRequestDto> listItemRequestDto = new ArrayList<>();
         Pageable pageable;
         Page<ItemRequest> page;
@@ -106,7 +92,33 @@ public class ItemRequestServiceImpl implements ItemRequestService {
             }
             listItemRequestDto = listItemRequestDto.stream().limit(size).collect(toList());
         }
-        return listItemRequestDto;
+        return checkItemRequestDto(listItemRequestDto);
+    }
 
+    private void checkExistUser(Long userId) {
+        if (!userRepository.existsById(userId)) {
+            throw new UserNotFoundException("Пользователь с ID = " + userId + " не найден!");
+        }
+    }
+
+    private List<ItemRequestDto> checkItemRequestDto(List<ItemRequestDto> listItemRequestDto) {
+        List<Long> requestIds = listItemRequestDto.stream()
+                .map(ItemRequestDto::getId)
+                .collect(toList());
+        List<Item> items = itemRepository.findByRequestIdIn(requestIds);
+        for (ItemRequestDto itemRequestDto : listItemRequestDto) {
+            List<Item> requestItems = items.stream()
+                    .filter(item -> item.getRequestId().equals(itemRequestDto.getId()))
+                    .collect(toList());
+            if (!requestItems.isEmpty()) {
+                List<ItemDto> itemDtos = requestItems.stream()
+                        .map(itemMapper::toItemDto)
+                        .collect(toList());
+                itemRequestDto.setItems(itemDtos);
+            } else {
+                itemRequestDto.setItems(Collections.emptyList());
+            }
+        }
+        return listItemRequestDto;
     }
 }
