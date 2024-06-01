@@ -28,7 +28,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto findByIdUser(Long id) {
-        return mapper.toUserDto(repository.findById(id).orElseThrow(() -> new UserNotFoundException("Пользователь с ID=" + id + " не найден!")));
+        return mapper.toUserDto(repository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException("Пользователь с ID=" + id + " не найден!")));
     }
 
     @Override
@@ -39,7 +40,8 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto updateUser(Long id, UserDto userDto) {
         User user = mapper.toUser(userDto);
-        User existingUser = repository.findById(id).orElseThrow(() -> new UserNotFoundException("Пользователь с ID= " + id + " не найден!"));
+        User existingUser = repository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException("Пользователь с ID= " + id + " не найден!"));
         if (user.getName() == null) user.setName(existingUser.getName());
         if (user.getEmail() == null) user.setEmail(existingUser.getEmail());
         existingUser.setName(user.getName());
@@ -49,6 +51,12 @@ public class UserServiceImpl implements UserService {
             throw new CorrectNameEmailException("Некорректный e-mail пользователя: " + user.getEmail());
         }
         return mapper.toUserDto(repository.save(existingUser));
+    }
+
+    @Override
+    public User findUserById(Long id) {
+        return repository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException("Пользователь с ID= " + id + " не найден!"));
     }
 
     @Override
