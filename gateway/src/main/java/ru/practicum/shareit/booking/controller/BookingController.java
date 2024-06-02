@@ -8,7 +8,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.booking.client.BookingClient;
-import ru.practicum.shareit.booking.dto.BookingInputDto;
+import ru.practicum.shareit.booking.dto.BookingDto;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
@@ -23,7 +23,7 @@ public class BookingController {
 
     @PostMapping
     public ResponseEntity<Object> newBooking(@RequestHeader(name = "X-Sharer-User-Id") Long bookerId,
-                                             @Valid @RequestBody BookingInputDto bookingDto) {
+                                             @Valid @RequestBody BookingDto bookingDto) {
         log.info("Создан новый букинг с ID = " + bookerId);
         return bookingClient.newBooking(bookerId, bookingDto);
     }
