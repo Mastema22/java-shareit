@@ -17,7 +17,6 @@ import ru.practicum.shareit.request.dto.ItemRequestDtoByOwner;
 import ru.practicum.shareit.request.mapper.ItemRequestMapper;
 import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.request.repository.ItemRequestRepository;
-import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.mapper.UserMapper;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
@@ -43,8 +42,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     public ItemRequestDto newRequestItem(ItemRequestDto itemRequestDto, Long requesterId, LocalDateTime created) {
         User user = userRepository.findById(requesterId)
                 .orElseThrow(() -> new UserNotFoundException("Пользователь с ID = " + requesterId + " не найден!"));
-        UserDto userDto = userMapper.toUserDto(user);
-        itemRequestDto.setRequester(userDto);
+        itemRequestDto.setRequester(user);
         itemRequestDto.setCreated(created);
         ItemRequest itemRequest = itemRequestMapper.toItemRequest(itemRequestDto);
         return itemRequestMapper.toItemRequestDto(itemRequestRepository.save(itemRequest));
