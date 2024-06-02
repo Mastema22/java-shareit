@@ -4,7 +4,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import ru.practicum.shareit.booking.dto.BookingDto;
+import ru.practicum.shareit.booking.dto.BookingInputDto;
 import ru.practicum.shareit.booking.dto.BookingOutputDto;
 import ru.practicum.shareit.booking.mapper.BookingMapper;
 import ru.practicum.shareit.booking.model.Booking;
@@ -32,7 +32,7 @@ public class BookingServiceImpl implements BookingService {
     private final BookingMapper bookingMapper;
 
     @Override
-    public BookingOutputDto newBooking(Long bookerId, BookingDto inputDto) {
+    public BookingOutputDto newBooking(Long bookerId, BookingInputDto inputDto) {
         Booking booking = bookingMapper.toBooking(inputDto);
         Item item = itemRepository.findById(booking.getItem().getId())
                 .orElseThrow(() -> new ItemNotFoundException("Вещь с ID= " + booking.getItem().getId() + " не найдена!"));

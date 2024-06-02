@@ -2,7 +2,7 @@ package ru.practicum.shareit.booking.mapper;
 
 import lombok.Data;
 import org.springframework.stereotype.Component;
-import ru.practicum.shareit.booking.dto.BookingDto;
+import ru.practicum.shareit.booking.dto.BookingInputDto;
 import ru.practicum.shareit.booking.dto.BookingOutputDto;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.Status;
@@ -26,7 +26,7 @@ public class BookingMapper {
         );
     }
 
-    public Booking toBooking(BookingDto dto) {
+    public Booking toBooking(BookingInputDto dto) {
         Item item = repository.findById(dto.getItemId()).orElseThrow(() -> new ItemNotFoundException("Вещь с ID = " + dto.getItemId() + "не найдена!"));
         return new Booking(
                 null,
