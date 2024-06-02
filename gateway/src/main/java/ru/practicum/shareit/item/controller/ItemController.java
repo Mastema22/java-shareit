@@ -3,6 +3,8 @@ package ru.practicum.shareit.item.controller;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.item.client.ItemClient;
 import ru.practicum.shareit.item.dto.CommentDto;
@@ -10,10 +12,11 @@ import ru.practicum.shareit.item.dto.ItemDto;
 
 import javax.validation.Valid;
 
-@Slf4j
-@RestController
+@Controller
+@RequestMapping(path = "/items")
 @RequiredArgsConstructor
-@RequestMapping("/items")
+@Slf4j
+@Validated
 public class ItemController {
     private final ItemClient itemClient;
 
@@ -24,6 +27,7 @@ public class ItemController {
         return itemClient.addNewItem(userId, itemDto);
     }
 
+    @ResponseBody
     @PatchMapping(value = "/{itemId}")
     public ResponseEntity<Object> updateItem(@PathVariable Long itemId,
                                              @RequestHeader(name = "X-Sharer-User-Id") Long userId,
@@ -44,12 +48,6 @@ public class ItemController {
         return itemClient.deleteItem(itemId, ownerId);
     }
 
-    @DeleteMapping("/{itemId}")
-    public ResponseEntity<Object> deleteItemsByOwner(@RequestHeader(name = "X-Sharer-User-Id") Long ownerId) {
-        log.info("Удаление вещей пользователя с ID={}", ownerId);
-        return itemClient.deleteItemsByOwner(ownerId);
-    }
-
     @GetMapping
     public ResponseEntity<Object> getItemsByOwner(@RequestHeader(name = "X-Sharer-User-Id") Long ownerId) {
         log.info("Получение всех вещей владельца с ID={}", ownerId);
@@ -62,6 +60,7 @@ public class ItemController {
         return itemClient.searchItem(text);
     }
 
+    @ResponseBody
     @PostMapping("/{itemId}/comment")
     public ResponseEntity<Object> create(@RequestHeader(name = "X-Sharer-User-Id") Long userId,
                                          @PathVariable Long itemId,
