@@ -36,15 +36,11 @@ public class UserClient extends BaseClient {
         return post("", userDto);
     }
 
-    public ResponseEntity<Object> findUserById(Long id) {
-        return get("/" + id);
-    }
-
     public ResponseEntity<Object> updateUser(Long id, UserDto userDto) {
         return patch("/" + id, userDto);
     }
 
-    public ResponseEntity<Object> deleteUser(Long id)  {
+    public ResponseEntity<Object> deleteUser(Long id) {
         return delete("/" + id);
     }
 }

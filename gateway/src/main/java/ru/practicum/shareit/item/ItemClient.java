@@ -1,4 +1,4 @@
-package ru.practicum.shareit.item.client;
+package ru.practicum.shareit.item;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
