@@ -1,4 +1,4 @@
 FROM amazoncorretto:11-alpine-jdk
-COPY target/*.jar shareit-gateway.jar
+COPY target/*.jar gateway.jar
 EXPOSE 8080
-ENTRYPOINT ["java","-jar","/shareit-gateway.jar"]
+ENTRYPOINT ["java","-jar","/gateway.jar"]
