@@ -19,12 +19,11 @@ import javax.validation.constraints.PositiveOrZero;
 @RequestMapping("/requests")
 @Validated
 public class ItemRequestController {
-    private final String USER_ID = "X-Sharer-User-Id";
     private final RequestClient requestClient;
 
     @PostMapping
     public ResponseEntity<Object> newItemRequest(@Valid @RequestBody ItemRequestDto itemRequestDto,
-                                                 @RequestHeader(USER_ID) @Positive Long requesterId) {
+                                                 @RequestHeader(name = "X-Sharer-User-Id") @Positive Long requesterId) {
         log.info("Получен POST-запрос к эндпоинту: '/requests' " +
                 "на создание запроса вещи от пользователя с ID = {}", requesterId);
         return requestClient.newRequestItem(itemRequestDto, requesterId);
@@ -32,19 +31,19 @@ public class ItemRequestController {
 
     @GetMapping("/{requestId}")
     public ResponseEntity<Object> getListRequestsAndAnswers(@PathVariable("requestId") Long itemRequestId,
-                                                            @RequestHeader(USER_ID) @Positive Long userId) {
+                                                            @RequestHeader(name = "X-Sharer-User-Id") @Positive Long userId) {
         log.info("Получен GET-запрос к эндпоинту: '/requests' на получение запроса с ID = {}", itemRequestId);
         return requestClient.getListRequestsAndAnswers(itemRequestId, userId);
     }
 
     @GetMapping
-    public ResponseEntity<Object> getDataByItemRequest(@RequestHeader(USER_ID) @Positive Long userId) {
+    public ResponseEntity<Object> getDataByItemRequest(@RequestHeader(name = "X-Sharer-User-Id") @Positive Long userId) {
         log.info("Получен GET-запрос к эндпоинту: '/requests' на получение запросов пользователя ID = {}", userId);
         return requestClient.getDataByItemRequest(userId);
     }
 
     @GetMapping("/all")
-    public ResponseEntity<Object> getListRequestsOtherUsers(@RequestHeader(USER_ID) @Positive Long userId,
+    public ResponseEntity<Object> getListRequestsOtherUsers(@RequestHeader(name = "X-Sharer-User-Id") @Positive Long userId,
                                                             @PositiveOrZero @RequestParam(defaultValue = "0")
                                                             @Min(0) Integer from,
                                                             @RequestParam(required = false, defaultValue = "10")
