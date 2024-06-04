@@ -45,7 +45,6 @@ public class ItemClient extends BaseClient {
         return delete("/" + itemId, ownerId);
     }
 
-
     public ResponseEntity<Object> searchItem(String text) {
         return get("/search?text=" + text);
     }

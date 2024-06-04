@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.user.dto.UserDto;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Positive;
 
 @Slf4j
 @Controller
@@ -31,20 +32,19 @@ public class UserController {
     }
 
     @GetMapping(value = "/{id}")
-    public ResponseEntity<Object> getUserById(@PathVariable Long id) {
+    public ResponseEntity<Object> getUserById(@PathVariable @Positive Long id) {
         log.info("Юзер под номером \"{}\" выведен", id);
         return userClient.findByIdUser(id);
     }
 
-
     @PatchMapping(value = "/{id}")
-    public ResponseEntity<Object> updateUser(@PathVariable Long id, @RequestBody UserDto userDto) {
+    public ResponseEntity<Object> updateUser(@PathVariable @Positive Long id, @RequestBody UserDto userDto) {
         log.info("Юзер под номером \"{}\" обновлен", id);
         return userClient.updateUser(id,userDto);
     }
 
     @DeleteMapping(value = "/{id}")
-    public ResponseEntity<Object> deleteUser(@PathVariable Long id) {
+    public ResponseEntity<Object> deleteUser(@PathVariable @Positive Long id) {
         log.info("Юзер под номером \"{}\" удален", id);
         return userClient.deleteUser(id);
     }

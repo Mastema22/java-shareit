@@ -3,12 +3,12 @@ package ru.practicum.shareit.booking;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 import ru.practicum.shareit.booking.dto.BookingDto;
+import ru.practicum.shareit.booking.dto.BookingState;
 import ru.practicum.shareit.client.BaseClient;
 
 import java.util.Map;
@@ -27,38 +27,33 @@ public class BookingClient extends BaseClient {
         );
     }
 
-    public ResponseEntity<Object> newBooking(Long bookerId, BookingDto inputDto) {
-        return post("", bookerId, inputDto);
+    public ResponseEntity<Object> newBooking(long userId, BookingDto bookingDto) {
+        return post("", userId, bookingDto);
     }
 
-
-    public ResponseEntity<Object> bookingRequest(Long ownerId, Long bookingId, boolean approved) {
-        return patch("/" + bookingId, ownerId, approved);
+    public ResponseEntity<Object> bookingRequest(long userId, long bookingId, Boolean approved) {
+        return patch("/" + bookingId + "?approved=" + approved, userId);
     }
 
-    public ResponseEntity<Object> getDataByBooking(Long bookerId, Long bookingId) {
-        return get("/" + bookingId, bookerId);
-    }
-
-    public ResponseEntity<Object> findAllByBooker(Long bookerId, String state, PageRequest pageRequest) {
+    public ResponseEntity<Object> findAllByBooker(long userId, BookingState state, Integer from, Integer size) {
         Map<String, Object> parameters = Map.of(
-                "state", state,
-                "from", pageRequest.getPageNumber(),
-                "size", pageRequest.getPageSize()
+                "state", state.name(),
+                "from", from,
+                "size", size
         );
-        return get("?state={state}&from={from}&size={size}", bookerId, parameters);
+        return get("?state={state}&from={from}&size={size}", userId, parameters);
     }
 
-    public ResponseEntity<Object> findAllByOwner(Long ownerId, String state, PageRequest pageRequest)  {
+    public ResponseEntity<Object> findAllByOwner(long userId, BookingState state, Integer from, Integer size) {
         Map<String, Object> parameters = Map.of(
-                "state", state,
-                "from", pageRequest.getPageNumber(),
-                "size", pageRequest.getPageSize()
+                "state", state.name(),
+                "from", from,
+                "size", size
         );
-        return get("?state={state}&from={from}&size={size}", ownerId, parameters);
+        return get("/owner?state={state}&from={from}&size={size}", userId, parameters);
     }
 
-    public ResponseEntity<Object> getBookingsBooker(String state, Long bookerId){
-        return get("/owner" + state, bookerId);
+    public ResponseEntity<Object> getDataByBooking(long userId, long bookingId) {
+        return get("/" + bookingId, userId);
     }
 }

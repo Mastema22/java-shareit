@@ -1,9 +1,10 @@
 package ru.practicum.shareit.booking.service;
 
 import lombok.AllArgsConstructor;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.dto.BookingInputDto;
 import ru.practicum.shareit.booking.dto.BookingOutputDto;
 import ru.practicum.shareit.booking.mapper.BookingMapper;
@@ -50,7 +51,7 @@ public class BookingServiceImpl implements BookingService {
         Booking newBooking = new Booking(null, booking.getStart(), booking.getEnd(), item, booker, booking.getStatus());
         return bookingMapper.toBookingDto(bookingRepository.save(newBooking));
     }
-
+    @Transactional
     @Override
     public BookingOutputDto bookingRequest(Long ownerId, Long bookingId, boolean approved) {
         User owner = userRepository.findById(ownerId).orElseThrow(() -> new UserNotFoundException("Пользователь с ID=" + ownerId + " не найден!"));
@@ -85,8 +86,9 @@ public class BookingServiceImpl implements BookingService {
         }
     }
 
+    @Transactional(readOnly = true)
     @Override
-    public List<BookingOutputDto> findAllByBooker(Long bookerId, String state, PageRequest pageRequest) {
+    public List<BookingOutputDto> findAllByBooker(Long bookerId, String state, Pageable pageRequest) {
         List<BookingOutputDto> bookingsDto = getBookingsBooker(state, bookerId);
         if (bookingsDto.isEmpty()) {
             throw new NotFoundBookingException("Бронирования пользователя с ID = " + bookerId + " не найдены!");
@@ -95,8 +97,9 @@ public class BookingServiceImpl implements BookingService {
                 Math.min(bookingsDto.size(), pageRequest.getPageNumber() + pageRequest.getPageSize()));
     }
 
+    @Transactional(readOnly = true)
     @Override
-    public List<BookingOutputDto> findAllByOwner(Long ownerId, String state, PageRequest pageRequest) {
+    public List<BookingOutputDto> findAllByOwner(Long ownerId, String state, Pageable pageRequest) {
         List<BookingOutputDto> bookingsDto = getBookingsOwner(state, ownerId);
         if (bookingsDto.isEmpty()) {
             throw new NotFoundBookingException("Нет бронирований у пользоватяеля с ID = " + ownerId);

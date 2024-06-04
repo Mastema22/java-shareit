@@ -10,7 +10,7 @@ import org.springframework.web.util.DefaultUriBuilderFactory;
 import ru.practicum.shareit.client.BaseClient;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
 
-import java.time.LocalDateTime;
+import java.util.Map;
 
 @Service
 public class RequestClient extends BaseClient {
@@ -26,8 +26,8 @@ public class RequestClient extends BaseClient {
         );
     }
 
-    public ResponseEntity<Object> newRequestItem(ItemRequestDto itemRequestDto, Long requesterId, LocalDateTime created)  {
-        return post("", itemRequestDto);
+    public ResponseEntity<Object> newRequestItem(ItemRequestDto itemRequestDto, Long requesterId)  {
+        return post("",requesterId, itemRequestDto);
     }
 
     public ResponseEntity<Object> getListRequestsAndAnswers(Long itemRequestId, Long userId) {
@@ -39,10 +39,10 @@ public class RequestClient extends BaseClient {
     }
 
     public ResponseEntity<Object> getListRequestsOtherUsers(Long userId, Integer from, Integer size) {
-        String path = "/all" + "?from=" + from;
-        if (size != null) {
-            path += "&size=" + size;
-        }
-        return get(path, userId, null);
+        Map<String, Object> parameters = Map.of(
+                "from", from,
+                "size", size
+        );
+        return get("/all?from={from}&size={size}", userId, parameters);
     }
 }
