@@ -51,6 +51,7 @@ public class BookingServiceImpl implements BookingService {
         Booking newBooking = new Booking(null, booking.getStart(), booking.getEnd(), item, booker, booking.getStatus());
         return bookingMapper.toBookingDto(bookingRepository.save(newBooking));
     }
+
     @Transactional
     @Override
     public BookingOutputDto bookingRequest(Long ownerId, Long bookingId, boolean approved) {
