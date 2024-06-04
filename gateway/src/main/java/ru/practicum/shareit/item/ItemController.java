@@ -17,11 +17,10 @@ import javax.validation.Valid;
 @Slf4j
 @Validated
 public class ItemController {
-    private static final String SHARER_USER_ID = "X-Sharer-User-Id";
     private final ItemClient itemClient;
 
     @PostMapping
-    public ResponseEntity<Object> saveNewItem(@RequestHeader(SHARER_USER_ID) Long userId,
+    public ResponseEntity<Object> saveNewItem(@RequestHeader(name = "X-Sharer-User-Id") Long userId,
                                               @RequestBody @Valid ItemDto itemDto) {
         log.info("Вещь под номером \"{}\" добавлена", itemDto.getId());
         return itemClient.addNewItem(userId, itemDto);
@@ -29,26 +28,26 @@ public class ItemController {
 
     @PatchMapping(value = "/{itemId}")
     public ResponseEntity<Object> updateItem(@PathVariable Long itemId,
-                                             @RequestHeader(SHARER_USER_ID) Long userId,
+                                             @RequestHeader(name = "X-Sharer-User-Id") Long userId,
                                              @RequestBody ItemDto itemDto) {
         log.info("Вещь под номером \"{}\" обновленна", itemId);
         return itemClient.updateItem(itemId, userId, itemDto);
     }
 
     @GetMapping("/{itemId}")
-    public ResponseEntity<Object> getItemById(@PathVariable Long itemId, @RequestHeader(SHARER_USER_ID) Long userId) {
+    public ResponseEntity<Object> getItemById(@PathVariable Long itemId, @RequestHeader(name = "X-Sharer-User-Id") Long userId) {
         log.info("Запрос на получение вещи с ID={}", itemId);
         return itemClient.getItemById(itemId, userId);
     }
 
     @DeleteMapping("/{itemId}")
-    public ResponseEntity<Object> delete(@PathVariable Long itemId, @RequestHeader(SHARER_USER_ID) Long ownerId) {
+    public ResponseEntity<Object> delete(@PathVariable Long itemId, @RequestHeader(name = "X-Sharer-User-Id") Long ownerId) {
         log.info("Удаление вещи с ID={}", itemId);
         return itemClient.deleteItem(itemId, ownerId);
     }
 
     @GetMapping
-    public ResponseEntity<Object> getItemsByOwner(@RequestHeader(SHARER_USER_ID) Long ownerId) {
+    public ResponseEntity<Object> getItemsByOwner(@RequestHeader(name = "X-Sharer-User-Id") Long ownerId) {
         log.info("Получение всех вещей владельца с ID={}", ownerId);
         return itemClient.getItemsByOwner(ownerId);
     }
@@ -60,7 +59,7 @@ public class ItemController {
     }
 
     @PostMapping("/{itemId}/comment")
-    public ResponseEntity<Object> create(@RequestHeader(SHARER_USER_ID) Long userId,
+    public ResponseEntity<Object> create(@RequestHeader(name = "X-Sharer-User-Id") Long userId,
                                          @PathVariable Long itemId,
                                          @RequestBody CommentDto commentDto) {
         return itemClient.createComment(commentDto, itemId, userId);

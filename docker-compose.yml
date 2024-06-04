@@ -2,6 +2,7 @@ version: '3.8'
 services:
   gateway:
     build: gateway
+    image: gateway
     container_name: gateway
     ports:
       - "8080:8080"
@@ -12,6 +13,7 @@ services:
 
   server:
     build: server
+    image: server
     container_name: server
     ports:
       - "9090:9090"
@@ -21,10 +23,13 @@ services:
       - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/shareit
       - POSTGRES_USER=root
       - POSTGRES_PASSWORD=root
+      - TZ=Europe/Moscow
 
   db:
-    image: postgres:13.7-alpine
+    image: postgres:16.0-alpine3.18
     container_name: db
+    volumes:
+      - ./database:/database/dockerDB.mv.db
     ports:
       - "6541:5432"
     environment:
