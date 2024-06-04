@@ -9,6 +9,11 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
+    <modules>
+        <module>gateway</module>
+        <module>server</module>
+    </modules>
+
     <groupId>ru.practicum</groupId>
     <artifactId>shareit</artifactId>
     <packaging>pom</packaging>
@@ -49,10 +54,6 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
-    <modules>
-        <module>gateway</module>
-        <module>server</module>
-    </modules>
 
     <build>
         <pluginManagement>
