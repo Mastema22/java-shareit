@@ -26,7 +26,7 @@ services:
       - POSTGRES_PASSWORD=root
 
   db:
-    image: postgres:latest
+    image: postgres:16-alpine
     container_name: shareit-db-container
     ports:
       - "6541:5432"
